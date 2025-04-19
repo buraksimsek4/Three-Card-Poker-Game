@@ -1,0 +1,629 @@
+/*
+ * CS342 Fall 2024
+ * Burak Simsek
+ * 3-Card Poker Game
+ * Project #2
+ */
+
+import javafx.fxml.FXML;
+import javafx.stage.Stage;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import java.util.ArrayList;
+
+public class GameplayController {
+    @FXML
+    private Stage stage; 
+    @FXML
+    private TextField playerOneAnteBet;
+    @FXML
+    private TextField playerTwoAnteBet;
+    
+    @FXML
+    private Label playerOneLabel;
+    @FXML
+    private Label playerTwoLabel;
+
+    @FXML
+    private TextField playerOnePairPlusBet;
+    @FXML
+    private TextField playerTwoPairPlusBet;
+    @FXML
+    private HBox dealerCards;
+    @FXML
+    private HBox playerOneCards;
+    @FXML
+    private HBox playerTwoCards;
+    @FXML
+    private Button dealCardsButton;
+    @FXML
+    private Button evaluateButton;
+    @FXML
+    private Label gameStatusLabel; 
+    @FXML
+    private Label playerOneTotalWinnings;
+    @FXML
+    private Label playerTwoTotalWinnings;
+    
+    @FXML
+    private Button playerOnePlayButton;
+    @FXML
+    private Button playerTwoPlayButton;
+
+    @FXML
+    private Button playerOneFoldButton;
+    @FXML
+    private Button playerTwoFoldButton;
+    
+    @FXML
+    private Button playerOneBetButton;
+    @FXML
+    private Button playerTwoBetButton;
+
+    
+    private Socket socket;
+    private Deck deck;
+    private Dealer dealer;
+    private Player playerOne;
+    private Player playerTwo;
+    
+
+    private boolean playerOnePlayed;
+    private boolean playerOneFolded;
+    private boolean playerTwoPlayed;
+    private boolean playerTwoFolded;
+    private boolean playerOneBetPlaced = false;
+    private boolean playerTwoBetPlaced = false;
+    private boolean gameStarted = false; 
+    
+
+    public GameplayController() {
+        dealer = new Dealer();
+        playerOne = new Player();
+        playerTwo = new Player();
+        deck = dealer.getDeck();
+    }
+
+    // Method to set the stage
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    
+    public void setPlayerNames(String playerOne, String playerTwo) {
+        playerOneLabel.setText("Player 1: " + playerOne);
+        playerTwoLabel.setText("Player 2: " + playerTwo);
+    }
+    
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+    
+    @FXML
+    public void exitGame() {
+        System.exit(0);
+    }
+
+    
+    
+    
+    @FXML
+    public void handleExitOption() {
+        System.exit(0);
+    }
+
+    @FXML
+    public void handleFreshStart() {
+        // Reinitialize the dealer, deck, and player hands
+        dealer = new Dealer();
+        deck = dealer.getDeck();
+        playerOne = new Player();
+        playerTwo = new Player();
+
+        // Clear the UI elements for dealer and player hands
+        dealerCards.getChildren().clear();
+        playerOneCards.getChildren().clear();
+        playerTwoCards.getChildren().clear();
+
+        // Reset bet input fields and enable them
+        playerOneAnteBet.clear();
+        playerOneAnteBet.setDisable(false);
+        playerOnePairPlusBet.clear();
+        playerOnePairPlusBet.setDisable(false);
+        playerTwoAnteBet.clear();
+        playerTwoAnteBet.setDisable(false);
+        playerTwoPairPlusBet.clear();
+        playerTwoPairPlusBet.setDisable(false);
+
+        // Reset the "Place Bet" buttons to their initial states
+        playerOneBetButton.setText("Place Bet");
+        playerTwoBetButton.setText("Place Bet");
+        playerOneBetPlaced = false;
+        playerTwoBetPlaced = false;
+
+        // Disable Play and Fold buttons until the game starts
+        playerOnePlayButton.setDisable(true);
+        playerOneFoldButton.setDisable(true);
+        playerTwoPlayButton.setDisable(true);
+        playerTwoFoldButton.setDisable(true);
+
+        // Disable the Deal Cards and Evaluate buttons until bets are placed
+        dealCardsButton.setDisable(true);
+        evaluateButton.setDisable(true);
+
+        // Reset game state variables
+        gameStarted = false;
+
+        // Reset winnings display for both players
+        playerOneTotalWinnings.setText("Player 1 Winnings: $0");
+        playerTwoTotalWinnings.setText("Player 2 Winnings: $0");
+
+        // Update the game status label
+        gameStatusLabel.setText("Fresh start. Place your bets to begin the game.");
+
+        // Ensure bet buttons are enabled for placing new bets
+        playerOneBetButton.setDisable(false);
+        playerTwoBetButton.setDisable(false);
+
+        // Log or print for confirmation (optional)
+        System.out.println("Game has been reset to fresh start.");
+    }
+
+
+
+    @FXML
+    public void handleNewLook() {
+        stage.getScene().getStylesheets().clear();
+        stage.getScene().getStylesheets().add(getClass().getResource("/newlook.css").toExternalForm());
+        System.out.println("New look applied.");
+    }
+
+    
+
+    @FXML
+    public void handlePlayerOneBet() {
+        if (playerOneBetButton.getText().equals("Place Bet")) {
+            try {
+                int anteBet = Integer.parseInt(playerOneAnteBet.getText().trim());
+                int pairPlusBet = Integer.parseInt(playerOnePairPlusBet.getText().trim());
+                if (isValidBet(anteBet) && isValidBet(pairPlusBet)) {
+                    playerOne.setAnteBet(anteBet);
+                    playerOne.setPairPlusBet(pairPlusBet);
+                    gameStatusLabel.setText("Player 1 bets placed: Ante $" + anteBet + ", Pair Plus $" + pairPlusBet);
+
+                    // Change the bet button text to "Change Bet" and lock the bet tiles
+                    playerOneBetButton.setText("Change Bet");
+                    playerOneAnteBet.setDisable(true);
+                    playerOnePairPlusBet.setDisable(true);
+                    playerOneBetPlaced = true;
+                    checkBetsAndEnableDealButton(); // The game is not started, only control is performed
+
+                } else {
+                    gameStatusLabel.setText("Invalid bet for Player 1. Bets must be between $5 and $25.");
+                }
+            } catch (NumberFormatException e) {
+                gameStatusLabel.setText("Invalid input for Player 1 bets.");
+            }
+        } else if (playerOneBetButton.getText().equals("Change Bet") && !gameStarted) {
+        	
+        	// Players can change their bets
+            playerOneAnteBet.setDisable(false);
+            playerOnePairPlusBet.setDisable(false);
+            playerOneBetButton.setText("Place Bet");
+            gameStatusLabel.setText("Player 1 is changing their bet.");
+        }
+    }
+
+    @FXML
+    public void handlePlayerTwoBet() {
+        if (playerTwoBetButton.getText().equals("Place Bet")) {
+            try {
+                int anteBet = Integer.parseInt(playerTwoAnteBet.getText().trim());
+                int pairPlusBet = Integer.parseInt(playerTwoPairPlusBet.getText().trim());
+                if (isValidBet(anteBet) && isValidBet(pairPlusBet)) {
+                    playerTwo.setAnteBet(anteBet);
+                    playerTwo.setPairPlusBet(pairPlusBet);
+                    gameStatusLabel.setText("Player 2 bets placed: Ante $" + anteBet + ", Pair Plus $" + pairPlusBet);
+
+                    // Change the bet button text to "Change Bet" and lock the bet tiles
+                    playerTwoBetButton.setText("Change Bet");
+                    playerTwoAnteBet.setDisable(true);
+                    playerTwoPairPlusBet.setDisable(true);
+                    playerTwoBetPlaced = true;
+                    checkBetsAndEnableDealButton(); // The game is not started, only control is performed
+                } else {
+                    gameStatusLabel.setText("Invalid bet for Player 2. Bets must be between $5 and $25.");
+                }
+            } catch (NumberFormatException e) {
+                gameStatusLabel.setText("Invalid input for Player 2 bets.");
+            }
+        } else if (playerTwoBetButton.getText().equals("Change Bet") && !gameStarted) {
+            // Players can change their bets
+            playerTwoAnteBet.setDisable(false);
+            playerTwoPairPlusBet.setDisable(false);
+            playerTwoBetButton.setText("Place Bet");
+            gameStatusLabel.setText("Player 2 is changing their bet.");
+        }
+    }
+
+
+
+    
+    private void checkBetsAndEnableDealButton() {
+        if (playerOneBetPlaced && playerTwoBetPlaced) {
+            dealCardsButton.setDisable(false); //Enable Deal Cards button
+        }
+    }
+
+
+
+    @FXML
+    public void handlePlayerOnePlay() {
+        playerOnePlayed = true;
+        playerOnePlayButton.setDisable(true);
+        playerOneFoldButton.setDisable(true);
+        checkIfReadyForEvaluation();
+        gameStatusLabel.setText("Player 1 chose to play.");
+    }
+
+    @FXML
+    public void handlePlayerOneFold() {
+        playerOneFolded = true;
+        playerOnePlayButton.setDisable(true);
+        playerOneFoldButton.setDisable(true);
+        checkIfReadyForEvaluation();
+        gameStatusLabel.setText("Player 1 chose to fold.");
+    }
+
+    
+    @FXML
+    public void handlePlayerTwoPlay() {
+        playerTwoPlayed = true;
+        playerTwoPlayButton.setDisable(true);
+        playerTwoFoldButton.setDisable(true);
+        checkIfReadyForEvaluation();
+        gameStatusLabel.setText("Player 2 chose to play.");
+    }
+
+    @FXML
+    public void handlePlayerTwoFold() {
+        playerTwoFolded = true;
+        playerTwoPlayButton.setDisable(true);
+        playerTwoFoldButton.setDisable(true);
+        checkIfReadyForEvaluation();
+        gameStatusLabel.setText("Player 2 chose to fold.");
+    }
+    
+    private void checkIfReadyForEvaluation() {
+        if ((playerOnePlayed || playerOneFolded) && (playerTwoPlayed || playerTwoFolded)) {
+            evaluateButton.setDisable(false);
+        }
+    }
+    private void checkBetsAndEnablePlayButtons() {
+        if (isValidBet(playerOne.getAnteBet()) && isValidBet(playerOne.getPairPlusBet())) {
+            playerOnePlayButton.setDisable(false);
+        } else {
+            playerOnePlayButton.setDisable(true);
+        }
+
+        if (isValidBet(playerTwo.getAnteBet()) && isValidBet(playerTwo.getPairPlusBet())) {
+            playerTwoPlayButton.setDisable(false);
+        } else {
+            playerTwoPlayButton.setDisable(true);
+        }
+    }
+
+    /**
+     * Evaluates a single player's hand and returns the result.
+     */
+    private String evaluateSinglePlayer(Player player, String playerName) {
+        ArrayList<Card> dealerHand = dealer.getDealersHand();
+        ArrayList<Card> playerHand = player.getHand();
+
+        //Evaluate dealer hand
+        int dealerEvaluation = ThreeCardLogic.evalHand(dealerHand);
+
+        if (dealerEvaluation < 12) {
+            player.updateTotalWinnings(player.getAnteBet()); // Ante bahsi iade edilir
+            return playerName + " wins ante bet as the dealer does not qualify with Queen high or better.";
+        }
+
+        //Evaluate the player's hand
+        int comparisonResult = ThreeCardLogic.compareHands(dealerHand, playerHand);
+        if (comparisonResult == 1) { // Dealer kazanırsa
+            return playerName + " loses to the dealer.";
+        } else if (comparisonResult == 2) { // Oyuncu kazanırsa
+            int winnings = player.getAnteBet() * 2 + player.getPlayBet() * 2;
+            player.updateTotalWinnings(winnings);
+            return playerName + " wins against the dealer.";
+        } else {
+            return playerName + " ties with the dealer. No additional winnings.";
+        }
+    }
+
+
+    // Modify the checkBetsAndUnlockControls method to update the label
+    private void checkBetsAndUnlockControls() {
+        if (areBetsValid()) {
+            unlockControls();
+            gameStatusLabel.setText("Both players have placed valid bets. Cards can be dealt if all are ready!");
+        }
+    }
+
+
+
+    @FXML
+    public void dealCards() {
+        if (!playerOneBetPlaced || !playerTwoBetPlaced) {
+            gameStatusLabel.setText("Both players must place their bets before dealing cards.");
+            return; // Starting the game is not allowed
+        }
+
+        if (dealCardsButton.getText().equals("Deal Cards")) {
+        	
+            // The process of dealing cards
+            gameStatusLabel.setText("Dealing cards...");
+            dealerCards.getChildren().clear();
+            playerOneCards.getChildren().clear();
+            playerTwoCards.getChildren().clear();
+
+            playerOne.setHand(dealer.dealHand());
+            playerTwo.setHand(dealer.dealHand());
+            dealer.setDealersHand(dealer.dealHand());
+
+            displayHand(playerOneCards, playerOne.getHand());
+            displayHand(playerTwoCards, playerTwo.getHand());
+            displayFaceDownCards(dealerCards);
+
+            // Activate the Play and Fold buttons and lock the Evaluate button
+            playerOnePlayButton.setDisable(false);
+            playerOneFoldButton.setDisable(false);
+            playerTwoPlayButton.setDisable(false);
+            playerTwoFoldButton.setDisable(false);
+            evaluateButton.setDisable(true);
+
+            // Lock bet boxes and Change Bet buttons
+            playerOneAnteBet.setDisable(true);
+            playerOnePairPlusBet.setDisable(true);
+            playerTwoAnteBet.setDisable(true);
+            playerTwoPairPlusBet.setDisable(true);
+            playerOneBetButton.setDisable(true);
+            playerTwoBetButton.setDisable(true);
+
+            dealCardsButton.setText("Re-Deal Cards"); // Change button text
+            gameStarted = true; // Mark game start
+        } else {
+            resetGameForNewRound();
+        }
+    }
+
+
+
+    @FXML
+    public void evaluateHands() {
+        // If an evaluation has already been made, do not allow it to be done again.
+        if (evaluateButton.isDisable()) {
+            return; // Finish the method
+        }
+
+        // Reveal the dealer's cards
+        dealerCards.getChildren().clear();
+        displayHand(dealerCards, dealer.getDealersHand());
+
+        // Evaluate game results
+        String result = evaluateGame();
+        gameStatusLabel.setText(result);
+
+        // Update player earnings
+        updateWinningsDisplay();
+
+        // Disable Evaluate button and change button text to Play Another
+        evaluateButton.setDisable(true);
+        dealCardsButton.setText("Play Another");
+
+        // Reactivate betting boxes
+        playerOneAnteBet.setDisable(false);
+        playerOnePairPlusBet.setDisable(false);
+        playerTwoAnteBet.setDisable(false);
+        playerTwoPairPlusBet.setDisable(false);
+
+        // Disable Play and Fold buttons
+        playerOnePlayButton.setDisable(true);
+        playerOneFoldButton.setDisable(true);
+        playerTwoPlayButton.setDisable(true);
+        playerTwoFoldButton.setDisable(true);
+
+        // Disable change bet buttons
+        playerOneBetButton.setDisable(true);
+        playerTwoBetButton.setDisable(true);
+    }
+
+
+    private void updateWinningsDisplay() {
+        playerOneTotalWinnings.setText("Player 1 Winnings: $" + playerOne.getTotalWinnings());
+        playerTwoTotalWinnings.setText("Player 2 Winnings: $" + playerTwo.getTotalWinnings());
+    }
+
+    
+    @FXML
+    public void handleReDealCards() {
+        // Procedures required to restart the game
+        if (!playerOneBetPlaced || !playerTwoBetPlaced) {
+            gameStatusLabel.setText("Both players must place bets before re-dealing cards.");
+            return;
+        }
+
+        // Restart the game, keeping old bets and balances
+        playerOneCards.getChildren().clear();
+        playerTwoCards.getChildren().clear();
+        dealerCards.getChildren().clear();
+
+        // Deduct players' bets from balances
+        playerOne.setTotalWinnings(playerOne.getTotalWinnings() - (playerOne.getAnteBet() + playerOne.getPairPlusBet()));
+        playerTwo.setTotalWinnings(playerTwo.getTotalWinnings() - (playerTwo.getAnteBet() + playerTwo.getPairPlusBet()));
+
+        // Deal new cards
+        playerOne.setHand(dealer.dealHand());
+        playerTwo.setHand(dealer.dealHand());
+        dealer.setDealersHand(dealer.dealHand());
+
+        displayHand(playerOneCards, playerOne.getHand());
+        displayHand(playerTwoCards, playerTwo.getHand());
+        displayFaceDownCards(dealerCards);
+
+        // Activate play and pass buttons
+        playerOnePlayButton.setDisable(false);
+        playerOneFoldButton.setDisable(false);
+        playerTwoPlayButton.setDisable(false);
+        playerTwoFoldButton.setDisable(false);
+
+        // Lock betting tiles
+        playerOneAnteBet.setDisable(true);
+        playerOnePairPlusBet.setDisable(true);
+        playerTwoAnteBet.setDisable(true);
+        playerTwoPairPlusBet.setDisable(true);
+
+        // Change Deal Cards button to Re-Deal Cards
+        dealCardsButton.setText("Re-Deal Cards");
+        evaluateButton.setDisable(true); // Evaluate should only be enabled after the game has started
+    }
+
+
+    private void displayHand(HBox cardContainer, ArrayList<Card> hand) {
+        for (Card card : hand) {
+            ImageView cardImageView = new ImageView(new Image("/cards_img/" + card.toString() + ".png"));
+            cardImageView.setFitWidth(75);
+            cardImageView.setPreserveRatio(true);
+            cardContainer.getChildren().add(cardImageView);
+        }
+    }
+
+    private void displayFaceDownCards(HBox cardContainer) {
+        for (int i = 0; i < 3; i++) {
+            ImageView cardImageView = new ImageView(new Image("/cards_img/back.png"));
+            cardImageView.setFitWidth(75);
+            cardImageView.setPreserveRatio(true);
+            cardContainer.getChildren().add(cardImageView);
+        }
+    }
+
+    
+    private void resetGameForNewRound() {
+        gameStatusLabel.setText("Place your bets for the next round.");
+        playerOneCards.getChildren().clear();
+        playerTwoCards.getChildren().clear();
+        dealerCards.getChildren().clear();
+
+        // Reactivate betting boxes
+        playerOneAnteBet.setDisable(false);
+        playerOnePairPlusBet.setDisable(false);
+        playerTwoAnteBet.setDisable(false);
+        playerTwoPairPlusBet.setDisable(false);
+        playerOneBetButton.setDisable(false);
+        playerTwoBetButton.setDisable(false);
+
+        // Lock Play and Fold buttons
+        playerOnePlayButton.setDisable(true);
+        playerOneFoldButton.setDisable(true);
+        playerTwoPlayButton.setDisable(true);
+        playerTwoFoldButton.setDisable(true);
+
+        dealCardsButton.setText("Deal Cards");
+        gameStarted = false; // Return to game start
+    }
+
+
+    
+    private boolean isValidBet(int bet) {
+        return bet >= 5 && bet <= 25;
+    }
+
+    private boolean areBetsValid() {
+        return isValidBet(playerOne.getAnteBet()) && isValidBet(playerOne.getPairPlusBet())
+                && isValidBet(playerTwo.getAnteBet()) && isValidBet(playerTwo.getPairPlusBet());
+    }
+
+    private void lockControls() {
+        dealCardsButton.setDisable(true);
+        evaluateButton.setDisable(true);
+    }
+
+    private void unlockControls() {
+        dealCardsButton.setDisable(false);
+    }
+
+
+
+    private String evaluateGame() {
+        ArrayList<Card> dealerHand = dealer.getDealersHand();
+        ArrayList<Card> playerOneHand = playerOne.getHand();
+        ArrayList<Card> playerTwoHand = playerTwo.getHand();
+        
+        StringBuilder gameResult = new StringBuilder();
+
+        // Determine the highest card by ranking the dealer hand
+        dealerHand.sort((c1, c2) -> Integer.compare(c1.getValue(), c2.getValue()));
+        int highestDealerCard = dealerHand.get(2).getValue(); 
+
+        // Dealer qualification check: Queen high or better
+        boolean dealerQualifies = highestDealerCard >= 12;
+
+        if (!dealerQualifies) {
+            // If the dealer does not qualify, ante bets are refunded, Pair Plus bets are considered
+            playerOne.updateTotalWinnings(playerOne.getAnteBet()); // Ante back
+            playerTwo.updateTotalWinnings(playerTwo.getAnteBet()); // Ante back
+            gameResult.append("Dealer does not qualify with Queen high. Ante wagers are returned.\n");
+        } else {
+            // Compare each player's hand if the dealer is qualified
+            evaluatePlayerVsDealer(playerOne, playerOneHand, dealerHand, gameResult, "Player 1");
+            evaluatePlayerVsDealer(playerTwo, playerTwoHand, dealerHand, gameResult, "Player 2");
+        }
+
+        // Evaluating Pair Plus bets (independent)
+        evaluatePairPlusBets(playerOne, playerOneHand, gameResult);
+        evaluatePairPlusBets(playerTwo, playerTwoHand, gameResult);
+
+        // Show updated total earnings on screen
+        updateWinningsDisplay();
+
+        // Print all game information on label
+        gameStatusLabel.setText(gameResult.toString());
+
+        return gameResult.toString();
+    }
+
+    private void evaluatePlayerVsDealer(Player player, ArrayList<Card> playerHand, ArrayList<Card> dealerHand, StringBuilder gameResult, String playerName) {
+        int comparisonResult = ThreeCardLogic.compareHands(dealerHand, playerHand);
+        if (comparisonResult == 2) {
+            // player wins
+            int winnings = player.getAnteBet() + player.getPlayBet();
+            player.updateTotalWinnings(winnings * 2);
+            gameResult.append(playerName).append(" wins against the dealer!\n");
+        } else if (comparisonResult == 1) {
+            // Dealer wins, player loses
+            player.updateTotalWinnings(-(player.getAnteBet() + player.getPlayBet()));
+            gameResult.append(playerName).append(" loses to the dealer.\n");
+        } else {
+            // A draw, the ante is returned
+            player.updateTotalWinnings(player.getAnteBet());
+            gameResult.append(playerName).append(" ties with the dealer; ante wager is returned.\n");
+        }
+    }
+
+    private void evaluatePairPlusBets(Player player, ArrayList<Card> hand, StringBuilder gameResult) {
+        int ppWinnings = ThreeCardLogic.evalPPWinnings(hand, player.getPairPlusBet());
+        if (ppWinnings > 0) {
+            player.updateTotalWinnings(ppWinnings);
+            gameResult.append(player == playerOne ? "Player 1" : "Player 2")
+                      .append(" wins Pair Plus: $").append(ppWinnings).append("\n");
+        } else if (player.getPairPlusBet() > 0) {
+            player.updateTotalWinnings(-player.getPairPlusBet());
+            gameResult.append(player == playerOne ? "Player 1" : "Player 2")
+                      .append(" loses Pair Plus.\n");
+        }
+    }
+}

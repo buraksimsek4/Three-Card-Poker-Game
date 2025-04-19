@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="GameController" style="-fx-background-image: url('/bg.png'); -fx-background-size: cover;">
+    <VBox spacing="20" alignment="CENTER" style="-fx-padding: 50;">
+        <!-- Logo -->
+        <ImageView fitWidth="300" preserveRatio="true">
+            <Image url="/logo.png" />
+        </ImageView>
+
+        <!-- Welcome Message -->
+        <Label fx:id="welcomeMessageLabel" text="Welcome to the game! Please enter player names to begin." 
+               style="-fx-text-fill: yellow; -fx-font-size: 16px; -fx-background-color: black; -fx-padding: 5px;"/>
+
+        <!-- Player 1 Name Input -->
+        <HBox spacing="5" alignment="CENTER">
+            <Label text="Player 1 Name:" style="-fx-text-fill: white; -fx-border-color: black; -fx-border-width: 1px; -fx-padding: 5px;"/>
+            <TextField fx:id="playerOneName" promptText="Enter Player 1 Name"/>
+            <Button fx:id="savePlayerOneButton" text="Save" onAction="#handleSavePlayerOne"/>
+        </HBox>
+
+        <!-- Player 2 Name Input -->
+        <HBox spacing="5" alignment="CENTER">
+            <Label text="Player 2 Name:" style="-fx-text-fill: white; -fx-border-color: black; -fx-border-width: 1px; -fx-padding: 5px;"/>
+            <TextField fx:id="playerTwoName" promptText="Enter Player 2 Name"/>
+            <Button fx:id="savePlayerTwoButton" text="Save" onAction="#handleSavePlayerTwo"/>
+        </HBox>
+
+
+        <!-- Buttons -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button fx:id="startGameButton" text="Start Game" onAction="#startGame" disable="true"/>
+            <Button text="Exit" onAction="#exitGame"/>
+        </HBox>
+    </VBox>
+</StackPane>

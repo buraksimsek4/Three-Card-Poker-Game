@@ -1,0 +1,31 @@
+import java.io.Serializable;
+
+public class PokerInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private String playerOneName;
+    private String playerTwoName;
+
+    // Constructor with two parameters
+    public PokerInfo(String playerOneName, String playerTwoName) {
+        this.playerOneName = playerOneName;
+        this.playerTwoName = playerTwoName;
+    }
+
+    // Getter and setter methods
+    public String getPlayerOneName() {
+        return playerOneName;
+    }
+
+    public void setPlayerOneName(String playerOneName) {
+        this.playerOneName = playerOneName;
+    }
+
+    public String getPlayerTwoName() {
+        return playerTwoName;
+    }
+
+    public void setPlayerTwoName(String playerTwoName) {
+        this.playerTwoName = playerTwoName;
+    }
+}

@@ -1,0 +1,63 @@
+import java.io.*;
+import java.net.Socket;
+
+public class ClientSocket {
+    private Socket socket;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+
+    public ClientSocket(String serverAddress, int port) {
+        try {
+            socket = new Socket(serverAddress, port);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+
+            System.out.println("Connected to server at " + serverAddress + ":" + port);
+        } catch (IOException e) {
+            System.err.println("Failed to connect to server: " + e.getMessage());
+        }
+    }
+
+    public void sendPokerInfo(PokerInfo info) {
+        try {
+            out.writeObject(info);
+            out.flush();
+            System.out.println("Sent to server: " + info.getMessage());
+
+            // Receive response from server
+            PokerInfo response = (PokerInfo) in.readObject();
+            if (response != null) {
+                System.out.println("Received from server: " + response.getMessage());
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Communication error: " + e.getMessage());
+        }
+    }
+
+    public void close() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to close client socket: " + e.getMessage());
+        }
+    }
+    
+ // Start game button is pressed
+    public void startGame() {
+        PokerInfo pokerInfo = new PokerInfo("Start Game");
+        sendPokerInfo(pokerInfo);
+    }
+
+    // Play button is pressed
+    public void playHand(ArrayList<Card> playerHand, ArrayList<Card> dealerHand, int anteBet, int pairPlusBet) {
+        PokerInfo pokerInfo = new PokerInfo("Play");
+        pokerInfo.setPlayerHand(playerHand);
+        pokerInfo.setDealerHand(dealerHand);
+        pokerInfo.setAnteBet(anteBet);
+        pokerInfo.setPairPlusBet(pairPlusBet);
+        sendPokerInfo(pokerInfo);
+    }
+    
+}

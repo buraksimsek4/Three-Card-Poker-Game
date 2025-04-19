@@ -1,0 +1,60 @@
+import java.io.*;
+import java.net.Socket;
+
+public class ClientHandler implements Runnable {
+    private Socket clientSocket;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+
+    public ClientHandler(Socket socket) {
+        this.clientSocket = socket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            // Initialize input and output streams for object serialization
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
+            in = new ObjectInputStream(clientSocket.getInputStream());
+
+            while (true) {
+                // Read PokerInfo from client
+                PokerInfo pokerInfo = (PokerInfo) in.readObject();
+
+                // Handle incoming PokerInfo
+                if (pokerInfo != null) {
+                    System.out.println("Received from client: " + pokerInfo.getMessage());
+                    // TODO: Add logic to evaluate the poker game here
+
+                    // Example: send response back to client
+                    pokerInfo.setMessage("Server processed your request.");
+                    sendToClient(pokerInfo);
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Client handler error: " + e.getMessage());
+        } finally {
+            stop();
+        }
+    }
+
+    private void sendToClient(PokerInfo info) {
+        try {
+            out.writeObject(info);
+            out.flush();
+        } catch (IOException e) {
+            System.err.println("Failed to send message to client: " + e.getMessage());
+        }
+    }
+
+    public void stop() {
+        try {
+            if (clientSocket != null && !clientSocket.isClosed()) {
+                clientSocket.close();
+                System.out.println("Client disconnected: " + clientSocket.getInetAddress());
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to close client socket: " + e.getMessage());
+        }
+    }
+}

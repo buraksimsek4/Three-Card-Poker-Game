@@ -1,0 +1,149 @@
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+
+public class ServerMain extends Application {
+
+    private Stage primaryStage;
+    private ServerSocket serverSocket;
+    private ArrayList<ClientHandler> clientHandlers;
+
+    @Override
+    public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        clientHandlers = new ArrayList<>();
+        showServerSetupScreen();
+    }
+
+    private void showServerSetupScreen() {
+        // Layout for server setup screen
+        GridPane gridPane = new GridPane();
+        gridPane.setVgap(10);
+        gridPane.setHgap(10);
+
+        // Label and text field for port number input
+        Label portLabel = new Label("Port Number:");
+        TextField portField = new TextField();
+
+        // Start server button
+        Button startButton = new Button("Start Server");
+        startButton.setOnAction(e -> {
+            int port = Integer.parseInt(portField.getText());
+            startServer(port);
+        });
+
+        // Stop server button
+        Button stopButton = new Button("Stop Server");
+        stopButton.setDisable(true); // Initially disabled
+        stopButton.setOnAction(e -> stopServer());
+
+        // Adding components to the layout
+        gridPane.add(portLabel, 0, 0);
+        gridPane.add(portField, 1, 0);
+        gridPane.add(startButton, 0, 1);
+        gridPane.add(stopButton, 1, 1);
+
+        // Set up the scene and show the stage
+        Scene setupScene = new Scene(gridPane, 400, 200);
+        primaryStage.setTitle("3 Card Poker - Server Setup");
+        primaryStage.setScene(setupScene);
+        primaryStage.show();
+    }
+
+    private void startServer(int port) {
+        try {
+            // Create a new server socket and start listening on the specified port
+            serverSocket = new ServerSocket(port);
+            System.out.println("Server started on port " + port);
+
+            // Start a new thread to handle incoming client connections
+            new Thread(() -> {
+                while (!serverSocket.isClosed()) {
+                    try {
+                        Socket clientSocket = serverSocket.accept();
+                        System.out.println("Client connected: " + clientSocket.getInetAddress());
+
+                        // Create a new ClientHandler to handle the client
+                        ClientHandler clientHandler = new ClientHandler(clientSocket);
+                        clientHandlers.add(clientHandler);
+                        new Thread(clientHandler).start();
+
+                    } catch (IOException e) {
+                        System.err.println("Error accepting client connection: " + e.getMessage());
+                    }
+                }
+            }).start();
+
+        } catch (IOException e) {
+            System.err.println("Failed to start the server: " + e.getMessage());
+        }
+    }
+
+    private void stopServer() {
+        try {
+            // Close all client handlers
+            for (ClientHandler handler : clientHandlers) {
+                handler.stop();
+            }
+            clientHandlers.clear();
+
+            // Close the server socket
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+            System.out.println("Server stopped.");
+
+        } catch (IOException e) {
+            System.err.println("Failed to stop the server: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+
+class ClientHandler implements Runnable {
+    private Socket clientSocket;
+
+    public ClientHandler(Socket socket) {
+        this.clientSocket = socket;
+    }
+
+    @Override
+    public void run() {
+        // Here we will handle communication with the client
+        // For now, we just simulate client handling
+        try {
+            System.out.println("Handling client: " + clientSocket.getInetAddress());
+            // TODO: Add communication logic here
+
+            // Simulating some work
+            Thread.sleep(5000);
+
+        } catch (InterruptedException e) {
+            System.err.println("Client handler interrupted: " + e.getMessage());
+        } finally {
+            stop();
+        }
+    }
+
+    public void stop() {
+        try {
+            if (clientSocket != null && !clientSocket.isClosed()) {
+                clientSocket.close();
+                System.out.println("Client disconnected: " + clientSocket.getInetAddress());
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to close client socket: " + e.getMessage());
+        }
+    }
+}

@@ -1,0 +1,162 @@
+.status-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: black;
+    -fx-alignment: center;
+    -fx-background-color: transparent;
+    -fx-padding: 5px;
+}
+
+
+/* Default styling for labels */
+.label {
+    -fx-font-family: "Arial";
+    -fx-text-fill: #333;
+    -fx-font-size: 14px;
+}
+
+/* Styling for the main title */
+.label[style="-fx-font-size: 24px;"] {
+    -fx-font-family: "Verdana";
+    -fx-text-fill: #0066cc;
+    -fx-font-weight: bold;
+}
+
+/* Styling for buttons */
+.button {
+    -fx-background-color: #0066cc;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.button:hover {
+    -fx-background-color: #004d99;
+}
+
+/* Styling for text fields */
+.text-field {
+    -fx-padding: 5;
+    -fx-border-color: #0066cc;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-padding: 5px;
+}
+
+
+/* Styling for large labels (e.g., Dealer, Player headers) */
+.label.large-label {
+    -fx-font-size: 18px;
+}
+
+/* Styling for game status label */
+#gameStatusLabel {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-background-color: black;
+    -fx-padding: 5px;
+}
+
+/* Styling for the main container background */
+.root {
+    -fx-background-image: url('/gamebg.png');
+    -fx-background-size: cover;
+}
+
+
+/* Styling for the MenuBar */
+.menu-bar {
+    -fx-background-color: #6A0D2D; /* Dark Bordeaux Red */
+}
+
+/* Styling for Menu items */
+.menu-item {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 5px;
+}
+
+/* Styling for Menu items on hover */
+.menu-item:hover {
+    -fx-background-color: #4B0018; /* Even Darker Bordeaux Red */
+}
+
+/* Styling for the popup menu background */
+.menu {
+    -fx-background-color: #6A0D2D; /* Dark Bordeaux Red for dropdown */
+}
+
+/* Styling for the popup menu items */
+.menu .menu-item {
+    -fx-background-color: #6A0D2D; /* Dark Bordeaux Red for items in dropdown */
+    -fx-text-fill: white;
+}
+
+/* Change background color on hover in dropdown menu */
+.menu .menu-item:hover {
+    -fx-background-color: #4B0018; /* Even Darker Bordeaux Red */
+}
+
+/* Additional styles to ensure the menu's text is aligned */
+.menu-bar .menu {
+    -fx-padding: 5px;
+}
+
+.player-section {
+    -fx-padding: 15; 
+    -fx-border-radius: 10; 
+    -fx-background-radius: 10;
+}
+
+.player-inner-section {
+    -fx-padding: 10;
+    -fx-background-color: rgba(0, 0, 0, 0.25); 
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 2); 
+}
+
+
+
+/* newlook.css */
+
+.new-look-label {
+    -fx-text-fill: #ffff00; /* Bright yellow text */
+    -fx-border-color: #ff0000; /* Red border */
+    -fx-border-width: 1px;
+    -fx-padding: 5px;
+}
+
+.new-look-button {
+    -fx-background-color: #800080; /* Purple background */
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-weight: bold;
+}
+
+.new-look-menu-bar {
+    -fx-background-color: #4b0082; /* Indigo background */
+    -fx-text-fill: #ffffff; /* White text */
+}
+
+.new-look-text-field {
+    -fx-border-color: #4b0082; /* Indigo border */
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-background-color: #333; /* Dark gray background */
+}
+
+/* Styling for the game status label */
+.new-look-game-status {
+    -fx-text-fill: #00ff00; /* Bright green */
+    -fx-background-color: #333; /* Dark gray */
+    -fx-padding: 5px;
+}
+

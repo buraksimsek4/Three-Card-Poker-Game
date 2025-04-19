@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameController">
+    <center>
+        <VBox spacing="10" alignment="CENTER">
+            <Label text="3 Card Poker - Client" style="-fx-font-size: 24px;" />
+            <HBox spacing="5" alignment="CENTER">
+                <Label text="Server IP: " />
+                <TextField fx:id="serverIPField" />
+            </HBox>
+            <HBox spacing="5" alignment="CENTER">
+                <Label text="Port Number: " />
+                <TextField fx:id="portNumberField" />
+            </HBox>
+            <Button text="Connect to Server" onAction="#connectToServer" />
+        </VBox>
+    </center>
+</BorderPane>

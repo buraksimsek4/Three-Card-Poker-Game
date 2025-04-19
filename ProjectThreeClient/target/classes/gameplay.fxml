@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="GameplayController"
+      prefWidth="1200" prefHeight="800"
+      stylesheets="@default.css">
+
+<!-- Fixed top menu -->    
+		<MenuBar styleClass="menu-bar">
+        <Menu text="Options">
+            <MenuItem text="Exit" onAction="#handleExitOption"/>
+            <MenuItem text="Fresh Start" onAction="#handleFreshStart"/>
+            <MenuItem text="New Look" onAction="#handleNewLook"/>
+        </Menu>
+    </MenuBar>
+
+    <!-- Main GridPane -->
+    <GridPane alignment="CENTER" hgap="20" vgap="20" maxWidth="1200" maxHeight="700" VBox.vgrow="ALWAYS">
+        
+        <!-- Dealer section -->
+        <VBox alignment="CENTER" GridPane.rowIndex="1" GridPane.columnIndex="1" spacing="10">
+            <Label text="Dealer" styleClass="large-label"/>
+            <HBox fx:id="dealerCards" alignment="CENTER" spacing="5"/>
+        </VBox>
+
+        <!-- Player 1 section -->
+        <VBox alignment="CENTER" spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-padding: 0 0 0 20px;" maxWidth="300">
+            <Label fx:id="playerOneLabel" text="Player 1" style="-fx-font-size: 18px;"/>
+            <HBox fx:id="playerOneCards" spacing="5" alignment="CENTER"/>
+            <TextField fx:id="playerOneAnteBet" promptText="Enter Ante Bet" alignment="CENTER" maxWidth="150"/>
+            <TextField fx:id="playerOnePairPlusBet" promptText="Enter Pair Plus Bet" alignment="CENTER" maxWidth="150"/>
+            <Label fx:id="playerOneTotalWinnings" text="Player 1 Winnings: $0" style="-fx-font-size: 14px;"/>
+            <Button fx:id="playerOneBetButton" text="Place Bet" onAction="#handlePlayerOneBet" maxWidth="100"/>
+            <VBox spacing="5" alignment="CENTER">
+                <Button fx:id="playerOnePlayButton" text="Play" onAction="#handlePlayerOnePlay" disable="true" maxWidth="80"/>
+                <Button fx:id="playerOneFoldButton" text="Fold" onAction="#handlePlayerOneFold" disable="true" maxWidth="80"/>
+            </VBox>
+        </VBox>
+
+        <!-- Player 2 section -->
+        <VBox alignment="CENTER" spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="2" style="-fx-padding: 0 20px 0 0;" maxWidth="300">
+            <Label fx:id="playerTwoLabel" text="Player 2" style="-fx-font-size: 18px;"/>
+            <HBox fx:id="playerTwoCards" spacing="5" alignment="CENTER"/>
+            <TextField fx:id="playerTwoAnteBet" promptText="Enter Ante Bet" alignment="CENTER" maxWidth="150"/>
+            <TextField fx:id="playerTwoPairPlusBet" promptText="Enter Pair Plus Bet" alignment="CENTER" maxWidth="150"/>
+            <Label fx:id="playerTwoTotalWinnings" text="Player 2 Winnings: $0" style="-fx-font-size: 14px;"/>
+            <Button fx:id="playerTwoBetButton" text="Place Bet" onAction="#handlePlayerTwoBet" maxWidth="100"/>
+            <VBox spacing="5" alignment="CENTER">
+                <Button fx:id="playerTwoPlayButton" text="Play" onAction="#handlePlayerTwoPlay" disable="true" maxWidth="80"/>
+                <Button fx:id="playerTwoFoldButton" text="Fold" onAction="#handlePlayerTwoFold" disable="true" maxWidth="80"/>
+            </VBox>
+        </VBox>
+
+        <!-- Game control buttons -->
+        <VBox alignment="CENTER" spacing="20" GridPane.rowIndex="3" GridPane.columnIndex="1">
+            <HBox alignment="CENTER" spacing="10">
+                <Button fx:id="dealCardsButton" text="Deal Cards" onAction="#dealCards" maxWidth="120"/>
+                <Button fx:id="evaluateButton" text="Evaluate Hands" onAction="#evaluateHands" disable="true" maxWidth="120"/>
+                <Button text="Exit" onAction="#exitGame" maxWidth="120"/>
+            </HBox>
+        </VBox>
+    </GridPane>
+
+    <!-- Fixed under label -->
+    <Label fx:id="gameStatusLabel" text="Game status will be shown here" styleClass="status-label" alignment="CENTER" prefWidth="1200"/>
+</VBox>

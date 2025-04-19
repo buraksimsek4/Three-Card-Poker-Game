@@ -1,0 +1,39 @@
+import java.io.Serializable;
+
+public class PokerInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private String playerOneName;
+    private String playerTwoName;
+
+    // Yeni kurucu iki oyuncunun ismini de alacak şekilde tanımlandı
+    public PokerInfo(String playerOneName, String playerTwoName) {
+        this.playerOneName = playerOneName;
+        this.playerTwoName = playerTwoName;
+    }
+
+    // Getter ve setter metodları
+    public String getPlayerOneName() {
+        return playerOneName;
+    }
+
+    public void setPlayerOneName(String playerOneName) {
+        this.playerOneName = playerOneName;
+    }
+
+    public String getPlayerTwoName() {
+        return playerTwoName;
+    }
+
+    public void setPlayerTwoName(String playerTwoName) {
+        this.playerTwoName = playerTwoName;
+    }
+
+    @Override
+    public String toString() {
+        return "PokerInfo{" +
+                "playerOneName='" + playerOneName + '\'' +
+                ", playerTwoName='" + playerTwoName + '\'' +
+                '}';
+    }
+}

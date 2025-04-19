@@ -1,0 +1,55 @@
+/* General label styling */
+.label {
+    -fx-font-family: "Georgia";
+    -fx-text-fill: #e0e0e0; /* Light gray for contrast */
+    -fx-border-color: #800000; /* Dark maroon border */
+    -fx-border-width: 2px;
+    -fx-padding: 5px;
+}
+
+/* Header label styling */
+.label[style="-fx-font-size: 18px;"] {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff; /* White text */
+}
+
+/* Game status label */
+#gameStatusLabel {
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-background-color: #800000; /* Dark maroon background */
+    -fx-padding: 10px;
+    -fx-border-color: #400000; /* Even darker maroon border */
+    -fx-border-width: 2px;
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: #800000; /* Dark maroon */
+    -fx-text-fill: #e0e0e0; /* Light gray text */
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #400000; /* Darker maroon border */
+}
+
+.button:hover {
+    -fx-background-color: #600000; /* Slightly lighter maroon for hover effect */
+}
+
+/* Menu bar styling */
+.menu-bar {
+    -fx-background-color: #800000; /* Dark maroon background */
+    -fx-border-color: #400000; /* Dark maroon border */
+}
+
+/* Menu item styling */
+.menu-item {
+    -fx-background-color: #800000; /* Dark maroon */
+    -fx-text-fill: #ffffff; /* White text */
+}
+
+.menu-item:hover {
+    -fx-background-color: #600000; /* Slightly lighter maroon for hover */
+}

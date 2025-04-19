@@ -1,0 +1,78 @@
+import java.io.Serializable;
+import java.util.ArrayList;
+
+// PokerInfo class to be used for communication between client and server
+public class PokerInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    // Information to pass between client and server
+    private String message;
+    private ArrayList<Card> playerHand;
+    private ArrayList<Card> dealerHand;
+    private int anteBet;
+    private int pairPlusBet;
+    private boolean playOrFold; // true if the player wants to play, false if they fold
+    private int totalWinnings;
+
+    // Constructor
+    public PokerInfo(String message) {
+        this.message = message;
+    }
+
+    // Getters and Setters
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public ArrayList<Card> getPlayerHand() {
+        return playerHand;
+    }
+
+    public void setPlayerHand(ArrayList<Card> playerHand) {
+        this.playerHand = playerHand;
+    }
+
+    public ArrayList<Card> getDealerHand() {
+        return dealerHand;
+    }
+
+    public void setDealerHand(ArrayList<Card> dealerHand) {
+        this.dealerHand = dealerHand;
+    }
+
+    public int getAnteBet() {
+        return anteBet;
+    }
+
+    public void setAnteBet(int anteBet) {
+        this.anteBet = anteBet;
+    }
+
+    public int getPairPlusBet() {
+        return pairPlusBet;
+    }
+
+    public void setPairPlusBet(int pairPlusBet) {
+        this.pairPlusBet = pairPlusBet;
+    }
+
+    public boolean isPlayOrFold() {
+        return playOrFold;
+    }
+
+    public void setPlayOrFold(boolean playOrFold) {
+        this.playOrFold = playOrFold;
+    }
+
+    public int getTotalWinnings() {
+        return totalWinnings;
+    }
+
+    public void setTotalWinnings(int totalWinnings) {
+        this.totalWinnings = totalWinnings;
+    }
+}
